@@ -1,7 +1,7 @@
 from random import randint, choice
 import laby_gen_graphics as graphics
 from time import sleep
-from typing import Optional, Any
+from typing import Optional, Any, Callable
 
 draw_intermediate = True
 path: Optional[list["Cell"]] = None
@@ -20,7 +20,16 @@ class PathError(Exception):
 
 
 class Cell:
+    """
+    Cell class: defines a Cell that can be used for labyrinth creation, able to link itself to its neighbours.
+    This is limited to 2D labyrinths with no diagonal movements.
+    """
     def __init__(self, coordinates: tuple[int, int] = (0, 0), links: set["Cell"] = None) -> None:
+        """
+        Cell class builder
+        :param coordinates: the coordinates of this cell. Expressed as a tuple (x, y)
+        :param links: the set of cells this one is linked to upon creation. None by default.
+        """
         if links is None:
             self.links = set()
         else:
@@ -28,10 +37,19 @@ class Cell:
         self.coordinates: tuple[int, int] = coordinates
 
     def link_to(self, other: "Cell") -> None:
+        """
+        Links this Cell to another
+        :param other: The Cell to link to
+        :return: None
+        """
         self.links.add(other)
         other.links.add(self)
 
     def get_nearby(self) -> dict[str:bool]:
+        """
+        Tells whether this Cell is linked to the one above, below, to the left and to the right of itself.
+        :return: a dict, keys are "up", "left", "down", or "right", values are bools.
+        """
         rt = {"up": False,
               "left": False,
               "down": False,
@@ -50,14 +68,34 @@ class Cell:
 
 
 def change_pos(position: tuple[int, int], diff: tuple[int, int]) -> tuple[int, int]:
+    """
+    offsets position by diff
+    :param position: the starting position, tuple (x, y)
+    :param diff: position offset, tuple (x, y)
+    :return: the offset position
+    """
     return position[0] + diff[0], position[1] + diff[1]
 
 
 def is_aligned(cell1: Cell, cell2: Cell) -> bool:
+    """
+    tells whether two cells are aligned or not
+    :param cell1: first Cell
+    :param cell2: second Cell
+    :return: bool, True if cells are aligned, else False
+    """
     return cell1.coordinates[0] == cell2.coordinates[0] or cell1.coordinates[1] == cell2.coordinates[1]
 
 
 def find_4th(table: list[list[Cell]], cell1: Cell, cell2: Cell, cell3: Cell) -> Cell:
+    """
+    finds the fourth Cell in a square from the 3 other, regardless of what way they were entered in.
+    :param table: The table containing all the cells
+    :param cell1: first Cell of the square
+    :param cell2: second Cell of the square
+    :param cell3: third cell of the square
+    :return: the 4th Cell object
+    """
     pos1, pos2, pos3 = (cell1.coordinates, cell2.coordinates, cell3.coordinates)
     offset_12 = (pos1[0] - pos2[0], pos1[1] - pos2[1])
     offset_13 = (pos1[0] - pos3[0], pos1[1] - pos3[1])
@@ -86,6 +124,11 @@ def find_4th(table: list[list[Cell]], cell1: Cell, cell2: Cell, cell3: Cell) -> 
 
 
 def create_table(side: int = 10) -> list[list[Cell]]:
+    """
+    Creates a square table, containing cells, with the right coordinates.
+    :param side: The length and width of the table
+    :return: a Table containing Cell objects
+    """
     cell_table: list[list[Cell]] = []
     for x in range(side):
         cell_table.append([])
@@ -96,6 +139,12 @@ def create_table(side: int = 10) -> list[list[Cell]]:
 
 
 def get_neighbours(table: list[list[Cell]], cel: Cell) -> list[Cell]:
+    """
+    From an initial cell, gets all the neighbouring ones.
+    :param table: Table containing all Cells
+    :param cel: the initial Cell
+    :return: a list of the neighbouring Cells
+    """
     tmp = (change_pos(cel.coordinates, (0, 1)),
            change_pos(cel.coordinates, (1, 0)),
            change_pos(cel.coordinates, (0, -1)),
@@ -108,10 +157,23 @@ def get_neighbours(table: list[list[Cell]], cel: Cell) -> list[Cell]:
 
 
 def is_in_bounds(pos: tuple[int, int], table: list[list[Any]]) -> bool:
+    """
+    bounds check for table coordinates
+    :param pos: tuple (x, y) of coordinates to check
+    :param table: table to check bounds for
+    :return: bool, True if in bounds.
+    """
     return pos[0] in range(len(table)) and pos[1] in range(len(table))
 
 
 def is_in_end_space(table: list[list[Cell]], elem: Cell, primary_path: list[Cell]) -> bool:
+    """
+    checks whether a Cell can reach the coordinates [-1, -1] in the table, without passing through the Path
+    :param table: the table in which we need to check
+    :param elem: the starting Cell
+    :param primary_path: the Path not to be crossed
+    :return: bool, True if the Cell can reach the coordinates.
+    """
     checked: set[Cell] = set(primary_path)
     target: Cell = table[-1][-1]
     todo: set[Cell] = {(elem,)}
@@ -128,6 +190,12 @@ def is_in_end_space(table: list[list[Cell]], elem: Cell, primary_path: list[Cell
 
 
 def get_authorized(table: list[list[Cell]], primary_path: list[Cell]) -> list[tuple[int, int]]:
+    """
+    gets all the positions a Cell can be linked to next
+    :param table: the table in which to check
+    :param primary_path: the Path not to be crossed
+    :return: the list of available next moves
+    """
     current: Cell = primary_path[-1]
     nxt: list[tuple[int, int]] = [change_pos(current.coordinates, (0, 1)),
                                   change_pos(current.coordinates, (1, 0)),
@@ -143,7 +211,12 @@ def get_authorized(table: list[list[Cell]], primary_path: list[Cell]) -> list[tu
     return nxt
 
 
-def full_recursive_path_creation(table: list[list[Cell]]):
+def full_recursive_path_creation(table: list[list[Cell]]) -> list[Cell]:
+    """
+    recursively creates a Path for the labyrinth.
+    :param table: The starting table in which this creates the path
+    :return: list of Cells constituting the Path
+    """
     global path
     path: list[Cell] = [table[0][0], ] if path is None else path
     auth_lst_tpl: list[tuple[int, int]] = get_authorized(table, path)
@@ -185,6 +258,11 @@ def full_recursive_path_creation(table: list[list[Cell]]):
 
 
 def randomize(lst: list[Any]) -> list[Any]:
+    """
+    randomizes a list of objects
+    :param lst: list to randomize
+    :return: randomized list
+    """
     nu: list[Any] = []
     lst = lst.copy()
     while len(lst) > 0:
@@ -193,6 +271,11 @@ def randomize(lst: list[Any]) -> list[Any]:
 
 
 def create_ramifications(table: list[list[Cell]]) -> None:
+    """
+    creates ramifications for the labyrinth, links directly the Cells of the given table to one another.
+    :param table: Input table, with pre-linked initial path.
+    :return: None.
+    """
     empty_left = True
     while empty_left:
         empty_left = False
@@ -209,12 +292,25 @@ def create_ramifications(table: list[list[Cell]]) -> None:
 
 
 def link_path(primary_path: list[Cell]) -> None:
+    """
+    links the elements of a Path list to one another
+    :param primary_path: the path to link
+    :return: None.
+    """
     for i in range(len(primary_path) - 1):
         primary_path[i].link_to(primary_path[i + 1])
 
 
 class ChallengeLabyrinth:
+    """
+    labyrinth class. Creates a labyrinth.
+    """
     def __init__(self, side: int = 10, dri: bool = False):
+        """
+        Labyrinth class builder
+        :param side: length of the labyrinth
+        :param dri: defines whether the labyrinth building process shall be drawn.
+        """
         global draw_intermediate
         draw_intermediate: bool = dri
         self._table: list[list[Cell]] = create_table(side)
@@ -229,30 +325,64 @@ class ChallengeLabyrinth:
 
 
 class LabyrinthSolverAPI(ChallengeLabyrinth):
-    def __init__(self, side: int = 10, dri: bool = False, drm: bool = False, log: bool = False):
+    """
+    Exposes a ChallengeLabyrinth to another program, giving the ability to move a cursor through the labyrinth and
+    to get the directions this cell is linked in.
+    """
+    def __init__(self, side: int = 10,
+                 dri: bool = False,
+                 drm: bool = False,
+                 log: bool = False,
+                 wrong_callback: Optional[Callable] = None):
+        """
+        API class builder
+        :param side: the length and width of the labyrinth
+        :param dri: defines whether the labyrinth building process shall be drawn.
+        :param drm: defines whether the labyrinth solving process shall be drawn
+        :param log: defines whether the solving process will be logged. TODO
+        :param wrong_callback: function callback for wrong move.
+        if set to none and drm is False, this will trigger a display warning.
+        """
         super().__init__(side, dri)
         graphics.draw_bg()
         self.draw_movements: bool = drm
         self.position: tuple[int, int] = self.start.coordinates
         self.near: dict[str:bool] = {}
         self.compute_near()
+        self.wrong_callback = wrong_callback
         self.log = log
         graphics.draw_cell(self.position, True)
 
     @staticmethod
-    def win():
+    def win() -> None:
+        """
+        displays a victory screen and exits
+        :return: None
+        """
         graphics.display_victory()
-        # TODO Log, Timer, nb_cps
         exit(0)
 
-    def compute_near(self):
+    def compute_near(self) -> None:
+        """
+        Computes nearby cells
+        :return: None
+        """
         self.near = self._table[self.position[0]][self.position[1]].get_nearby()
 
-    def compute_win(self):
+    def compute_win(self) -> bool:
+        """
+        Computes whether the algorithm has solved the labyrinth
+        :return: bool, True if labyrinth is solved
+        """
         return self.position == self.end.coordinates
 
-    def move(self, direction: str, wrong_callback: Optional[type(exit)] = None):
-        if wrong_callback is None:
+    def move(self, direction: str) -> bool:
+        """
+        Moves the cursor in the specified direction
+        :param direction: The direction to move in. "up", "left", "down", or "right"
+        :return: True if movement was successful, else False.
+        """
+        if self.wrong_callback is None:
             wait = True
         else:
             wait = False
@@ -268,7 +398,7 @@ class LabyrinthSolverAPI(ChallengeLabyrinth):
                     sleep(.5)
                     graphics.undraw_wrong()
                 else:
-                    wrong_callback()
+                    self.wrong_callback()
             return False
         else:
             self.position = change_pos(self.position, directions_to_coordinates[direction])
