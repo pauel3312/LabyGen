@@ -5,7 +5,6 @@ from typing import Optional, Any
 
 draw_intermediate = True
 path: Optional[list["Cell"]] = None
-ACCENT_COLOR = (255, 0, 0)
 
 directions_to_coordinates = {
     "up": (0, -1),
@@ -96,7 +95,7 @@ def create_table(side: int = 10) -> list[list[Cell]]:
     return cell_table
 
 
-def get_neighbours(table, cel):
+def get_neighbours(table: list[list[Cell]], cel: Cell) -> list[Cell]:
     tmp = (change_pos(cel.coordinates, (0, 1)),
            change_pos(cel.coordinates, (1, 0)),
            change_pos(cel.coordinates, (0, -1)),
@@ -108,32 +107,32 @@ def get_neighbours(table, cel):
     return rtn
 
 
-def is_in_bounds(pos, table):
+def is_in_bounds(pos: tuple[int, int], table: list[list[Any]]) -> bool:
     return pos[0] in range(len(table)) and pos[1] in range(len(table))
 
 
-def is_in_end_space(table, elem, primary_path: list[Cell]):
+def is_in_end_space(table: list[list[Cell]], elem: Cell, primary_path: list[Cell]) -> bool:
     checked: set[Cell] = set(primary_path)
     target: Cell = table[-1][-1]
     todo: set[Cell] = {(elem,)}
     while len(todo) > 0:
-        current = todo.pop()
+        current: Cell = todo.pop()
         checked.add(current)
         if current == target:
             return True
-        neighbours = get_neighbours(table, current)
+        neighbours: list[Cell] = get_neighbours(table, current)
         for nb in neighbours:
             if nb not in checked:
                 todo.add(nb)
     return False
 
 
-def get_authorized(table, primary_path):
-    current = primary_path[-1]
-    nxt = [change_pos(current.coordinates, (0, 1)),
-           change_pos(current.coordinates, (1, 0)),
-           change_pos(current.coordinates, (0, -1)),
-           change_pos(current.coordinates, (-1, 0))]
+def get_authorized(table: list[list[Cell]], primary_path: list[Cell]) -> list[tuple[int, int]]:
+    current: Cell = primary_path[-1]
+    nxt: list[tuple[int, int]] = [change_pos(current.coordinates, (0, 1)),
+                                  change_pos(current.coordinates, (1, 0)),
+                                  change_pos(current.coordinates, (0, -1)),
+                                  change_pos(current.coordinates, (-1, 0))]
     i = 0
     while i < len(nxt):
         if is_in_bounds(nxt[i], table) and table[nxt[i][0]][nxt[i][1]] not in primary_path:
@@ -144,17 +143,10 @@ def get_authorized(table, primary_path):
     return nxt
 
 
-def has_unlinked_neighbours(table, cel):
-    for nb in get_neighbours(table, cel):
-        if len(nb.links) == 0:
-            return True
-    return False
-
-
-def full_recursive_path_creation(table):
+def full_recursive_path_creation(table: list[list[Cell]]):
     global path
-    path = [table[0][0], ] if path is None else path
-    auth_lst_tpl = get_authorized(table, path)
+    path: list[Cell] = [table[0][0], ] if path is None else path
+    auth_lst_tpl: list[tuple[int, int]] = get_authorized(table, path)
     if path[-1].coordinates == (len(table) - 1, len(table) - 1):
         return path
     auth_lst = []
@@ -170,20 +162,20 @@ def full_recursive_path_creation(table):
         else:
             if first and len(auth_lst) == 2:
                 if is_aligned(auth_lst[0], auth_lst[1]) or \
-                        find_4th(table, auth_lst[0], auth_lst[1], path[-1]) in path:
+                   find_4th(table, auth_lst[0], auth_lst[1], path[-1]) in path:
                     if is_in_end_space(table, auth_lst[0], path):
-                        current = auth_lst[0]
+                        current: Cell = auth_lst[0]
                     else:
-                        current = auth_lst[1]
+                        current: Cell = auth_lst[1]
                 else:
                     first = False
-                    current = choice(auth_lst)
+                    current: Cell = choice(auth_lst)
             else:
                 first = False
-                current = choice(auth_lst)
+                current: Cell = choice(auth_lst)
             auth_lst.remove(current)
             if draw_intermediate:
-                graphics.draw_cell(current.coords, ACCENT_COLOR)
+                graphics.draw_cell(current.coordinates, True)
             try:
                 path.append(current)
                 full_recursive_path_creation(table)
@@ -192,15 +184,15 @@ def full_recursive_path_creation(table):
             return path
 
 
-def randomize(lst):
-    nu = []
+def randomize(lst: list[Any]) -> list[Any]:
+    nu: list[Any] = []
     lst = lst.copy()
     while len(lst) > 0:
         nu.append(lst.pop(randint(0, len(lst) - 1)))
     return nu
 
 
-def create_ramifications(table):
+def create_ramifications(table: list[list[Cell]]) -> None:
     empty_left = True
     while empty_left:
         empty_left = False
@@ -216,7 +208,7 @@ def create_ramifications(table):
                             break
 
 
-def link_path(primary_path):
+def link_path(primary_path: list[Cell]) -> None:
     for i in range(len(primary_path) - 1):
         primary_path[i].link_to(primary_path[i + 1])
 
@@ -224,15 +216,15 @@ def link_path(primary_path):
 class ChallengeLabyrinth:
     def __init__(self, side: int = 10, dri: bool = False):
         global draw_intermediate
-        draw_intermediate = dri
-        self._table = create_table(side)
-        self._path = full_recursive_path_creation(self._table)
+        draw_intermediate: bool = dri
+        self._table: list[list[Cell]] = create_table(side)
+        self._path: list[Cell] = full_recursive_path_creation(self._table)
         link_path(self._path)
         if dri:
             graphics.draw_table(self._table)
         create_ramifications(self._table)
-        self.start = self._table[0][0]
-        self.end = self._path[-1]
+        self.start: Cell = self._table[0][0]
+        self.end: Cell = self._path[-1]
         graphics.draw_table(self._table)
 
 
@@ -240,8 +232,8 @@ class LabyrinthSolverAPI(ChallengeLabyrinth):
     def __init__(self, side: int = 10, dri: bool = False, drm: bool = False, log: bool = False):
         super().__init__(side, dri)
         graphics.draw_bg()
-        self.draw_movements = drm
-        self.position = self.start.coordinates
+        self.draw_movements: bool = drm
+        self.position: tuple[int, int] = self.start.coordinates
         self.near: dict[str:bool] = {}
         self.compute_near()
         self.log = log
@@ -289,4 +281,4 @@ class LabyrinthSolverAPI(ChallengeLabyrinth):
 
 
 if __name__ == "__main__":
-    A = LabyrinthSolverAPI(12, True)
+    Labyrinth = LabyrinthSolverAPI(12, True)
