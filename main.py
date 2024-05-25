@@ -1,5 +1,5 @@
 from random import randint, choice
-import laby_gen_graphics as graphics
+import terminal_graphics as graphics
 from time import sleep
 from typing import Optional, Any, Callable
 
@@ -396,7 +396,7 @@ class LabyrinthSolverAPI(ChallengeLabyrinth):
                 if wait:
                     graphics.draw_wrong()
                     sleep(.5)
-                    graphics.undraw_wrong()
+                    graphics.un_draw_wrong()
                 else:
                     self.wrong_callback()
             return False
