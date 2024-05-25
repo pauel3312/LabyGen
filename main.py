@@ -1,7 +1,7 @@
 from random import randint, choice
 import laby_gen_graphics as graphics
 from time import sleep
-from typing import Optional
+from typing import Optional, Any
 
 draw_intermediate = True
 path: Optional[list["Cell"]] = None
@@ -94,15 +94,6 @@ def create_table(side: int = 10) -> list[list[Cell]]:
             current = Cell((x, y))
             cell_table[x].append(current)
     return cell_table
-
-# TODO type hinting
-
-
-def to_set(table):
-    set_out = set()
-    for line in table:
-        set_out = set_out.union(set(line))
-    return set_out
 
 
 def get_neighbours(table, cel):
