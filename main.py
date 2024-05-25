@@ -246,14 +246,15 @@ class ChallengeLabyrinth:
 
 
 class LabyrinthSolverAPI(ChallengeLabyrinth):
-    def __init__(self, side: int = 10, dri: bool = False, log: bool = False):
-        graphics.draw_bg()
+    def __init__(self, side: int = 10, dri: bool = False, drm: bool = False, log: bool = False):
         super().__init__(side, dri)
+        graphics.draw_bg()
+        self.draw_movements = drm
         self.position = self.start.coordinates
         self.near: dict[str:bool] = {}
         self.compute_near()
         self.log = log
-        graphics.draw_cell(self.position, ACCENT_COLOR)
+        graphics.draw_cell(self.position, True)
 
     @staticmethod
     def win():
@@ -272,24 +273,25 @@ class LabyrinthSolverAPI(ChallengeLabyrinth):
             wait = True
         else:
             wait = False
-        graphics.draw_cell(self.position)
+        if self.draw_movements:
+            graphics.draw_cell(self.position)
         if direction not in ("up", "left", "down", "right"):
             raise NameError("Invalid direction")
         if self.near[direction] is False:
-            if draw_intermediate:
-                graphics.draw_cell(self.position, ACCENT_COLOR)
-                graphics.draw_wrong()
+            if self.draw_movements:
+                graphics.draw_cell(self.position, True)
                 if wait:
+                    graphics.draw_wrong()
                     sleep(.5)
+                    graphics.undraw_wrong()
                 else:
                     wrong_callback()
-                graphics.undraw_wrong()
             return False
         else:
             self.position = change_pos(self.position, directions_to_coordinates[direction])
             self.compute_near()
-            if draw_intermediate:
-                graphics.draw_cell(self.position, ACCENT_COLOR)
+            if self.draw_movements:
+                graphics.draw_cell(self.position, True)
             if self.compute_win():
                 self.win()
             return True
