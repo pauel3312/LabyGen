@@ -201,23 +201,6 @@ def full_recursive_path_creation(table):
             return path
 
 
-def get_all_linked_near_unlinked(table):
-    returns = set()
-    done = set()
-    todo: set[Cell] = {(table[0][0],)}
-    while len(todo) > 0:
-        current = todo.pop()
-        done.add(current)
-        for nb in get_neighbours(table, current):
-            if len(nb.links) == 0:
-                returns.add(current)
-                if draw_intermediate:
-                    graphics.draw_cell(current.coordinates, ACCENT_COLOR)
-            elif nb not in done:
-                todo.add(nb)
-    return returns
-
-
 def randomize(lst):
     nu = []
     lst = lst.copy()
