@@ -36,12 +36,28 @@ def draw_path(pos1: tuple[int, int], pos2: tuple[int, int]) -> None:
     pass
 
 
+def transpose(table: list[list[Any]]) -> list[list[Any]]:
+    """
+    Transposes a square table
+    :param table: The table to transpose. will not be modified.
+    :return: a new, transposed table
+    """
+    new = []
+    for i in range(len(table[0])):
+        new.append([])  # Screw mutable defaults man, I wanted this to be a one liner
+    for line in table:
+        for i, elem in enumerate(line):
+            new[i].append(elem)
+    return new
+
+
 def draw_table(table: list[list[Any]], accents: Optional[set[Any]] = None) -> None:
     """
     draws the whole table from the list of cells
     :param table: The table to draw
     :param accents: set of cells to draw accentuated
     """
+    table = transpose(table)
     if accents is None:
         accents = set()
     for i, line in enumerate(table):
@@ -91,4 +107,4 @@ def display_victory() -> None:
 
 
 if __name__ == '__main__':
-    print(CHAR_VERTICAL_PATH)
+    print(transpose([[1, 2, 3], [4, 5, 6], [7, 8, 9]]))
