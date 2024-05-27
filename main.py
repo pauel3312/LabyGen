@@ -176,7 +176,7 @@ def is_in_end_space(table: list[list[Cell]], elem: Cell, primary_path: list[Cell
     """
     checked: set[Cell] = set(primary_path)
     target: Cell = table[-1][-1]
-    todo: set[Cell] = {(elem,)}
+    todo: set[Cell] = {elem, }
     while len(todo) > 0:
         current: Cell = todo.pop()
         checked.add(current)
@@ -218,7 +218,7 @@ def full_recursive_path_creation(table: list[list[Cell]]) -> list[Cell]:
     :return: list of Cells constituting the Path
     """
     global path
-    path: list[Cell] = [table[0][0], ] if path is None else path
+    path = [table[0][0], ] if path is None else path
     auth_lst_tpl: list[tuple[int, int]] = get_authorized(table, path)
     if path[-1].coordinates == (len(table) - 1, len(table) - 1):
         return path
@@ -312,7 +312,7 @@ class ChallengeLabyrinth:
         :param dri: defines whether the labyrinth building process shall be drawn.
         """
         global draw_intermediate
-        draw_intermediate: bool = dri
+        draw_intermediate = dri
         self._table: list[list[Cell]] = create_table(side)
         self._path: list[Cell] = full_recursive_path_creation(self._table)
         link_path(self._path)
@@ -411,4 +411,4 @@ class LabyrinthSolverAPI(ChallengeLabyrinth):
 
 
 if __name__ == "__main__":
-    Labyrinth = LabyrinthSolverAPI(12, True)
+    Labyrinth = LabyrinthSolverAPI(12)
