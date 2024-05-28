@@ -333,7 +333,8 @@ class LabyrinthSolverAPI(ChallengeLabyrinth):
                  dri: bool = False,
                  drm: bool = False,
                  log: bool = False,
-                 wrong_callback: Optional[Callable] = None):
+                 wrong_callback: Optional[Callable] = None,
+                 win_callback: Optional[Callable] = None):
         """
         API class builder
         :param side: the length and width of the labyrinth
@@ -349,19 +350,22 @@ class LabyrinthSolverAPI(ChallengeLabyrinth):
         self.position: tuple[int, int] = self.start.coordinates
         self.near: dict[str:bool] = {}
         self.compute_near()
+        self.win_callback = win_callback
         self.wrong_callback = wrong_callback
         self.log = log
         graphics.draw_cell(self.position, True)
         graphics.draw_table(self._table, {self.start, })  # remove  for non-terminal UI
 
-    @staticmethod
-    def win() -> None:
+    def win(self) -> None:
         """
         displays a victory screen and exits
         :return: None
         """
         graphics.display_victory()
-        exit(0)
+        if self.win_callback is not None:
+            self.win_callback()
+        else:
+            exit(0)
 
     def compute_near(self) -> None:
         """
