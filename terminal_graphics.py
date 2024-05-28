@@ -44,7 +44,7 @@ def transpose(table: list[list[Any]]) -> list[list[Any]]:
     """
     new = []
     for i in range(len(table[0])):
-        new.append([])  # Screw mutable defaults man, I wanted this to be a one liner
+        new.append([])  # Screw mutable defaults man, I wanted this to be a one-liner
     for line in table:
         for i, elem in enumerate(line):
             new[i].append(elem)
