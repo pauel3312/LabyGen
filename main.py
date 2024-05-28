@@ -352,6 +352,7 @@ class LabyrinthSolverAPI(ChallengeLabyrinth):
         self.wrong_callback = wrong_callback
         self.log = log
         graphics.draw_cell(self.position, True)
+        graphics.draw_table(self._table, {self.start, })  # remove  for non-terminal UI
 
     @staticmethod
     def win() -> None:
@@ -407,8 +408,9 @@ class LabyrinthSolverAPI(ChallengeLabyrinth):
                 graphics.draw_cell(self.position, True)
             if self.compute_win():
                 self.win()
+            graphics.draw_table(self._table, {self._table[self.position[0]][self.position[1]]})
+            # remove for non-terminal UI
             return True
-
 
 if __name__ == "__main__":
     Labyrinth = LabyrinthSolverAPI(12)
