@@ -176,7 +176,7 @@ def is_in_end_space(table: list[list[Cell]], elem: Cell, primary_path: list[Cell
     """
     checked: set[Cell] = set(primary_path)
     target: Cell = table[-1][-1]
-    todo: set[Cell] = {(elem,)}
+    todo: set[Cell] = {elem, }
     while len(todo) > 0:
         current: Cell = todo.pop()
         checked.add(current)
@@ -218,7 +218,7 @@ def full_recursive_path_creation(table: list[list[Cell]]) -> list[Cell]:
     :return: list of Cells constituting the Path
     """
     global path
-    path: list[Cell] = [table[0][0], ] if path is None else path
+    path = [table[0][0], ] if path is None else path
     auth_lst_tpl: list[tuple[int, int]] = get_authorized(table, path)
     if path[-1].coordinates == (len(table) - 1, len(table) - 1):
         return path
@@ -312,7 +312,7 @@ class ChallengeLabyrinth:
         :param dri: defines whether the labyrinth building process shall be drawn.
         """
         global draw_intermediate
-        draw_intermediate: bool = dri
+        draw_intermediate = dri
         self._table: list[list[Cell]] = create_table(side)
         self._path: list[Cell] = full_recursive_path_creation(self._table)
         link_path(self._path)
@@ -333,7 +333,8 @@ class LabyrinthSolverAPI(ChallengeLabyrinth):
                  dri: bool = False,
                  drm: bool = False,
                  log: bool = False,
-                 wrong_callback: Optional[Callable] = None):
+                 wrong_callback: Optional[Callable] = None,
+                 win_callback: Optional[Callable] = None):
         """
         API class builder
         :param side: the length and width of the labyrinth
@@ -349,18 +350,22 @@ class LabyrinthSolverAPI(ChallengeLabyrinth):
         self.position: tuple[int, int] = self.start.coordinates
         self.near: dict[str:bool] = {}
         self.compute_near()
+        self.win_callback = win_callback
         self.wrong_callback = wrong_callback
         self.log = log
         graphics.draw_cell(self.position, True)
+        graphics.draw_table(self._table, {self.start, })  # remove  for non-terminal UI
 
-    @staticmethod
-    def win() -> None:
+    def win(self) -> None:
         """
         displays a victory screen and exits
         :return: None
         """
         graphics.display_victory()
-        exit(0)
+        if self.win_callback is not None:
+            self.win_callback()
+        else:
+            exit(0)
 
     def compute_near(self) -> None:
         """
@@ -407,8 +412,9 @@ class LabyrinthSolverAPI(ChallengeLabyrinth):
                 graphics.draw_cell(self.position, True)
             if self.compute_win():
                 self.win()
+            graphics.draw_table(self._table, {self._table[self.position[0]][self.position[1]]})
+            # remove for non-terminal UI
             return True
 
-
 if __name__ == "__main__":
-    Labyrinth = LabyrinthSolverAPI(12, True)
+    Labyrinth = LabyrinthSolverAPI(12)
