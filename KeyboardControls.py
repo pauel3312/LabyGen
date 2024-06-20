@@ -8,6 +8,7 @@ def stop_game():
     global game_on
     game_on = False
 
+
 Labyrinth = LabyrinthSolverAPI(side=10, drm=True, win_callback=stop_game)
 
 for hotkey in ("up", "left", "down", "right"):

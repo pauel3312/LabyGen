@@ -416,5 +416,6 @@ class LabyrinthSolverAPI(ChallengeLabyrinth):
             # remove for non-terminal UI
             return True
 
+
 if __name__ == "__main__":
     Labyrinth = LabyrinthSolverAPI(12)
