@@ -211,52 +211,6 @@ def get_authorized(table: list[list[Cell]], primary_path: list[Cell]) -> list[tu
     return nxt
 
 
-def full_recursive_path_creation(table: list[list[Cell]]) -> list[Cell]:
-    """
-    recursively creates a Path for the labyrinth.
-    :param table: The starting table in which this creates the path
-    :return: list of Cells constituting the Path
-    """
-    global path
-    path = [table[0][0], ] if path is None else path
-    auth_lst_tpl: list[tuple[int, int]] = get_authorized(table, path)
-    if path[-1].coordinates == (len(table) - 1, len(table) - 1):
-        return path
-    auth_lst = []
-    for elem in auth_lst_tpl:
-        auth_lst.append(table[elem[0]][elem[1]])
-    first = True
-    while 1:
-        if len(auth_lst) == 0:
-            if draw_intermediate:
-                graphics.draw_cell(path[-1].coordinates, )
-            path.pop(-1)
-            raise PathError("Path impossible!")
-        else:
-            if first and len(auth_lst) == 2:
-                if is_aligned(auth_lst[0], auth_lst[1]) or \
-                   find_4th(table, auth_lst[0], auth_lst[1], path[-1]) in path:
-                    if is_in_end_space(table, auth_lst[0], path):
-                        current: Cell = auth_lst[0]
-                    else:
-                        current: Cell = auth_lst[1]
-                else:
-                    first = False
-                    current: Cell = choice(auth_lst)
-            else:
-                first = False
-                current: Cell = choice(auth_lst)
-            auth_lst.remove(current)
-            if draw_intermediate:
-                graphics.draw_cell(current.coordinates, True)
-            try:
-                path.append(current)
-                full_recursive_path_creation(table)
-            except PathError:
-                continue
-            return path
-
-
 def randomize(lst: list[Any]) -> list[Any]:
     """
     randomizes a list of objects
@@ -315,7 +269,7 @@ class ChallengeLabyrinth:
         draw_intermediate = dri
         graphics.init(side)
         self._table: list[list[Cell]] = create_table(side)
-        self._path: list[Cell] = full_recursive_path_creation(self._table)
+        self._path = [self._table[0][0], self._table[0][1]]
         link_path(self._path)
         if dri:
             graphics.draw_table(self._table)
