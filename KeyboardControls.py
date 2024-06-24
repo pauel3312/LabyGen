@@ -1,4 +1,4 @@
-from main import LabyrinthSolverAPI
+from main import LabyrinthSolverAPI, graphics
 import keyboard as kb
 
 game_on = True
@@ -16,5 +16,4 @@ for hotkey in ("up", "left", "down", "right"):
 
 kb.add_hotkey('esc', stop_game)
 
-while game_on:
-    pass
+graphics.loop()

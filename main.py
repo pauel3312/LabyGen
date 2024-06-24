@@ -1,5 +1,5 @@
 from random import randint, choice
-import terminal_graphics as graphics
+import pygame_graphics as graphics
 from time import sleep
 from typing import Optional, Any, Callable
 
@@ -313,6 +313,7 @@ class ChallengeLabyrinth:
         """
         global draw_intermediate
         draw_intermediate = dri
+        graphics.init(side)
         self._table: list[list[Cell]] = create_table(side)
         self._path: list[Cell] = full_recursive_path_creation(self._table)
         link_path(self._path)
@@ -353,8 +354,8 @@ class LabyrinthSolverAPI(ChallengeLabyrinth):
         self.win_callback = win_callback
         self.wrong_callback = wrong_callback
         self.log = log
+        graphics.draw_table(self._table, {self.start, })
         graphics.draw_cell(self.position, True)
-        graphics.draw_table(self._table, {self.start, })  # remove  for non-terminal UI
 
     def win(self) -> None:
         """
@@ -412,10 +413,17 @@ class LabyrinthSolverAPI(ChallengeLabyrinth):
                 graphics.draw_cell(self.position, True)
             if self.compute_win():
                 self.win()
-            graphics.draw_table(self._table, {self._table[self.position[0]][self.position[1]]})
-            # remove for non-terminal UI
+            # graphics.draw_table(self._table, {self._table[self.position[0]][self.position[1]]})
+            # uncomment for terminal UI
             return True
 
 
 if __name__ == "__main__":
-    Labyrinth = LabyrinthSolverAPI(12)
+    Labyrinth = LabyrinthSolverAPI(34, True, True)
+    while 1:
+        for event in graphics.pygame.event.get():
+            if event.type == graphics.pygame.QUIT:
+                graphics.pygame.quit()
+                exit(0)
+        graphics.pygame.display.flip()
+

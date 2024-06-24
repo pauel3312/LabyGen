@@ -6,6 +6,10 @@ CHAR_HORIZONTAL_PATH = "\u2550"
 CHAR_VERTICAL_PATH = "\u2016"
 
 
+def init(side: int):
+    pass
+
+
 def draw_bg() -> None:
     """
     draws the background on top of the image
