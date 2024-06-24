@@ -1,5 +1,6 @@
 from typing import Optional, Any
 import pygame
+from time import sleep
 
 BACKGROUND_COLOUR: pygame.color.Color = pygame.color.Color(4, 4, 4)
 CELL_COLOUR: pygame.color.Color = pygame.color.Color(4, 255, 4)
@@ -8,10 +9,46 @@ WALL_COLOUR: pygame.color.Color = pygame.color.Color(4, 4, 4)
 
 cell_size: int = 10
 wall_size: int = 4
-wrong_cue_size = 20
+wrong_cue_size = 60
 init_done: bool = False
 screen: Optional[pygame.surface]
 clock: Optional[pygame.time.Clock]
+
+
+def translate(pt: tuple[int, int], matrix: tuple[int, int]) -> tuple[int, int]:
+    return pt[0]+matrix[0], pt[1]+matrix[1]
+
+
+WRONG_CROSS_SURFACE: pygame.surface = pygame.Surface((wrong_cue_size-wall_size, wrong_cue_size-wall_size))
+WRONG_CROSS_RECT = WRONG_CROSS_SURFACE.get_rect()
+wrong_cross_points: list[tuple[int, int]] = [WRONG_CROSS_RECT.topleft,
+                                             translate(WRONG_CROSS_RECT.topleft,
+                                                       (0, int((wrong_cue_size-wall_size)/6))),
+                                             translate(WRONG_CROSS_RECT.midleft,
+                                                       (int((wrong_cue_size-wall_size)/3), 0)),
+                                             translate(WRONG_CROSS_RECT.bottomleft,
+                                                       (0, -int((wrong_cue_size-wall_size)/6))),
+                                             WRONG_CROSS_RECT.bottomleft,
+                                             translate(WRONG_CROSS_RECT.bottomleft,
+                                                       (int((wrong_cue_size-wall_size)/6), 0)),
+                                             translate(WRONG_CROSS_RECT.midbottom,
+                                                       (0, -int((wrong_cue_size-wall_size)/3))),
+                                             translate(WRONG_CROSS_RECT.bottomright,
+                                                       (-int((wrong_cue_size-wall_size)/6), 0)),
+                                             WRONG_CROSS_RECT.bottomright,
+                                             translate(WRONG_CROSS_RECT.bottomright,
+                                                       (0, -int((wrong_cue_size-wall_size)/6))),
+                                             translate(WRONG_CROSS_RECT.center,
+                                                       (int((wrong_cue_size-wall_size)/6), 0)),
+                                             translate(WRONG_CROSS_RECT.topright,
+                                                       (0, int((wrong_cue_size-wall_size)/6))),
+                                             WRONG_CROSS_RECT.topright,
+                                             translate(WRONG_CROSS_RECT.topright,
+                                                       (-int((wrong_cue_size-wall_size)/6), 0)),
+                                             translate(WRONG_CROSS_RECT.center,
+                                                       (0, -int((wrong_cue_size-wall_size)/6))),
+                                             translate(WRONG_CROSS_RECT.topleft,
+                                                       (int((wrong_cue_size-wall_size)/6), 0))]
 
 
 def init(n_cells: int) -> None:
@@ -83,39 +120,6 @@ def draw_path(pos1: tuple[int, int], pos2: tuple[int, int]) -> None:
     pygame.display.update()
 
 
-"""    diff = (pos1[0]-pos2[0], pos1[1]-pos2[1])
-    if abs(diff[0]) + abs(diff[1]) != 1:
-        raise Exception("wrong neighbours")
-    if diff[0] == 0:
-        x = pos1[0] * (cell_size + wall_size) + wall_size
-        h = cell_size
-        w = cell_size + wall_size
-        if diff[1] > 0:
-            y = pos2[1] * (cell_size + wall_size) + wall_size
-        else:
-            y = pos1[1] * (cell_size + wall_size) + wall_size
-    else:
-        y = pos1[1] * (cell_size + wall_size) + wall_size
-        h = cell_size + wall_size
-        w = cell_size
-        if diff[0] > 0:
-            x = pos2[0] * (cell_size + wall_size) + wall_size
-        else:
-            x = pos1[0] * (cell_size + wall_size) + wall_size
-    pygame.draw.rect(screen, CELL_COLOUR, (x, y, w, h))
-    pygame.display.update()
-"""
-
-
-def transpose(table: list[list[Any]]) -> list[list[Any]]:
-    """
-    Transposes a square table
-    :param table: The table to transpose. will not be modified.
-    :return: a new, transposed table
-    """
-    pass
-
-
 def draw_table(table: list[list[Any]], accents: Optional[set[Any]] = None) -> None:
     """
     draws the whole table from the list of cells
@@ -141,7 +145,9 @@ def draw_wrong() -> None:
     """
     draws a "move wrong" cue
     """
-    pass
+    pygame.draw.polygon(WRONG_CROSS_SURFACE, ACCENT_COLOUR, wrong_cross_points)
+    screen.blit(WRONG_CROSS_SURFACE, translate(screen.get_rect().topright, (-wrong_cue_size, 0)))
+    pygame.display.update()
 
 
 def un_draw_wrong() -> None:
@@ -151,22 +157,32 @@ def un_draw_wrong() -> None:
     you can disable the "move wrong" cue by specifying a "wrong callback function"
     in the API constructor
     """
-    pass
+    WRONG_CROSS_SURFACE.fill(BACKGROUND_COLOUR)
+    screen.blit(WRONG_CROSS_SURFACE, translate(screen.get_rect().topright, (-wrong_cue_size, 0)))
+    pygame.display.update()
 
 
 def display_victory() -> None:
     """
     displays a victory screen ayd exits the script.
     """
-    pass
+    draw_bg()
+    font = pygame.font.SysFont('Castellar', 48)
+    txt = font.render('You won!', True, CELL_COLOUR)
+    txt_rect = txt.get_rect()
+    x = screen.get_rect().centerx-txt_rect.centerx
+    y = screen.get_rect().centery-txt_rect.centery
+    screen.blit(txt, (x, y))
+    pygame.display.flip()
+
+    sleep(3)
+    exit(0)
 
 
 if __name__ == '__main__':
     init(30)
-    draw_bg()
-    test_table = [[0, ] * 30, ] * 30
-    draw_table(test_table)
-    draw_path((0, 0), (0, 1))
+    pygame.draw.polygon(WRONG_CROSS_SURFACE, ACCENT_COLOUR, wrong_cross_points)
+    screen.blit(WRONG_CROSS_SURFACE, (0, 0))
     while 1:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
