@@ -9,7 +9,7 @@ def stop_game():
     game_on = False
 
 
-Labyrinth = LabyrinthSolverAPI(side=100, dri=True, drm=True, win_callback=stop_game)
+Labyrinth = LabyrinthSolverAPI(side=500, dri=False, drm=True, win_callback=stop_game)
 
 for hotkey in ("up", "left", "down", "right"):
     kb.add_hotkey(hotkey, Labyrinth.move, args=(hotkey, ), timeout=0.5)

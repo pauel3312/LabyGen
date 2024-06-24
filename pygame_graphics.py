@@ -7,8 +7,8 @@ CELL_COLOUR: pygame.color.Color = pygame.color.Color(4, 255, 4)
 ACCENT_COLOUR: pygame.color.Color = pygame.color.Color(255, 4, 4)
 WALL_COLOUR: pygame.color.Color = pygame.color.Color(4, 4, 4)
 
-cell_size: int = 10
-wall_size: int = 4
+cell_size: int = 4
+wall_size: int = 1
 wrong_cue_size = 60
 init_done: bool = False
 screen: Optional[pygame.surface]
@@ -83,7 +83,7 @@ def draw_cell_links(cell: Any) -> None:
         draw_path(cell.coordinates, nb.coordinates)
 
 
-def draw_cell(pos: tuple[int, int], toggle_accent: bool = False) -> None:
+def draw_cell(pos: tuple[int, int], toggle_accent: bool = False, update_display: bool = True) -> None:
     """
     draws the cell at position pos, in accent color if toggle accent else in normal colour
     pos is the tuple of table coordinates
@@ -91,12 +91,14 @@ def draw_cell(pos: tuple[int, int], toggle_accent: bool = False) -> None:
     and my limited terminal manipulation knowledge.
     :param pos: tuple of table positions, (x, y)
     :param toggle_accent: if True, uses accent color
+    :param update_display: Determines if the display should be updated after drawing
     """
     pygame.draw.rect(screen, ACCENT_COLOUR if toggle_accent else CELL_COLOUR,
                      (pos[0] * (cell_size + wall_size) + wall_size,
                       pos[1] * (cell_size + wall_size) + wall_size,
                       cell_size, cell_size))
-    pygame.display.update()
+    if update_display:
+        pygame.display.update()
 
 
 def draw_path(pos1: tuple[int, int], pos2: tuple[int, int]) -> None:
@@ -133,10 +135,10 @@ def draw_table(table: list[list[Any]], accents: Optional[set[Any]] = None) -> No
         for y, cell in enumerate(line):
             pygame.display.update()
             if accents is None:
-                draw_cell((x, y))
+                draw_cell((x, y), update_display=False)
                 draw_cell_links(cell)
             else:
-                draw_cell((x, y), cell in accents)
+                draw_cell((x, y), cell in accents, False)
                 draw_cell_links(cell)
     pygame.display.update()
 
