@@ -12,7 +12,6 @@ wall_size: int = 1
 wrong_cue_size = 60
 init_done: bool = False
 screen: Optional[pygame.surface]
-clock: Optional[pygame.time.Clock]
 
 
 def translate(pt: tuple[int, int], matrix: tuple[int, int]) -> tuple[int, int]:
@@ -57,7 +56,6 @@ def init(n_cells: int) -> None:
     size_y = n_cells * (cell_size + wall_size) + wall_size
     pygame.init()
     screen = pygame.display.set_mode((size_x, size_y))
-    clock = pygame.time.Clock()
     init_done = True
     pygame.display.update()
 
