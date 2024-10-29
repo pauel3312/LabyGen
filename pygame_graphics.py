@@ -51,7 +51,7 @@ wrong_cross_points: list[tuple[int, int]] = [WRONG_CROSS_RECT.topleft,
 
 
 def init(n_cells: int) -> None:
-    global init_done, screen, clock
+    global init_done, screen
     size_x = n_cells * (cell_size + wall_size) + wall_size + wrong_cue_size
     size_y = n_cells * (cell_size + wall_size) + wall_size
     pygame.init()
