@@ -131,7 +131,6 @@ def draw_table(table: list[list[Any]], accents: Optional[set[Any]] = None) -> No
     draw_bg()
     for x, line in enumerate(table):
         for y, cell in enumerate(line):
-            pygame.display.update()
             if accents is None:
                 draw_cell((x, y), update_display=False)
                 draw_cell_links(cell)
