@@ -380,4 +380,3 @@ if __name__ == "__main__":
                 graphics.pygame.quit()
                 exit(0)
         graphics.pygame.display.flip()
-
