@@ -272,11 +272,11 @@ class ChallengeLabyrinth:
         self._path = [self._table[0][0], self._table[0][1]]
         link_path(self._path)
         if dri:
+            graphics.draw_bg()
             graphics.draw_table(self._table)
         create_ramifications(self._table)
         self.start: Cell = self._table[0][0]
         self.end: Cell = self._path[-1]
-        graphics.draw_table(self._table)
 
 
 class LabyrinthSolverAPI(ChallengeLabyrinth):
@@ -300,7 +300,8 @@ class LabyrinthSolverAPI(ChallengeLabyrinth):
         if set to none and drm is False, this will trigger a display warning.
         """
         super().__init__(side, dri)
-        graphics.draw_bg()
+        if not dri:
+            graphics.draw_bg()
         self.draw_movements: bool = drm
         self.position: tuple[int, int] = self.start.coordinates
         self.near: dict[str:bool] = {}
@@ -308,7 +309,6 @@ class LabyrinthSolverAPI(ChallengeLabyrinth):
         self.win_callback = win_callback
         self.wrong_callback = wrong_callback
         self.log = log
-        graphics.draw_table(self._table, {self.start, })
         graphics.draw_cell(self.position, True)
 
     def win(self) -> None:
