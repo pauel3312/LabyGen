@@ -11,7 +11,7 @@ cell_size: int = 4
 wall_size: int = 1
 wrong_cue_size = 60
 init_done: bool = False
-screen: Optional[pygame.surface]
+screen: Optional[pygame.Surface]
 
 
 def translate(pt: tuple[int, int], matrix: tuple[int, int]) -> tuple[int, int]:
