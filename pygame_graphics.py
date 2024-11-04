@@ -7,8 +7,8 @@ CELL_COLOUR: pygame.color.Color = pygame.color.Color(4, 255, 4)
 ACCENT_COLOUR: pygame.color.Color = pygame.color.Color(255, 4, 4)
 WALL_COLOUR: pygame.color.Color = pygame.color.Color(4, 4, 4)
 
-cell_size: int = 4
-wall_size: int = 1
+cell_size: int = 12
+wall_size: int = 3
 wrong_cue_size = 60
 init_done: bool = False
 screen: Optional[pygame.Surface]
