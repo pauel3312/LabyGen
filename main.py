@@ -276,7 +276,7 @@ class ChallengeLabyrinth:
             graphics.draw_table(self._table)
         create_ramifications(self._table)
         self.start: Cell = self._table[0][0]
-        self.end: Cell = self._path[-1]
+        self.end: Cell = self._table[side-1][side-1]
 
 
 class LabyrinthSolverAPI(ChallengeLabyrinth):
