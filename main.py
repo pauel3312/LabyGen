@@ -1,4 +1,4 @@
-from random import randint, choice
+from random import randint
 import pygame_graphics as graphics
 from time import sleep
 from typing import Optional, Any, Callable
